@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Environmental Monitor</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <h1>Environmental Monitor</h1>
+
+    <h2>Latest Reading</h2>
+
+    <p>Temperature: <span id="temperature">--</span> °C</p>
+    <p>Humidity: <span id="humidity">--</span> %</p>
+    <p>Pressure: <span id="pressure">--</span> hPa</p>
+    <p>Timestamp: <span id="timestamp">--</span></p>
+
+    <h2>Temperature History</h2>
+    <canvas id="temperatureChart"></canvas>
+
+    <h2>Humidity History</h2>
+    <canvas id="humidityChart"></canvas>
+
+    <h2>Pressure History</h2>
+    <canvas id="pressureChart"></canvas>
+
+    <script>
+        let temperatureChart;
+        let humidityChart;
+        let pressureChart;
+
+        async function updateDashboard() {
+            const latestResponse = await fetch("/api/latest");
+
+            if (latestResponse.ok) {
+                const data = await latestResponse.json();
+
+                document.getElementById("temperature").textContent =
+                    data.temperature;
+
+                document.getElementById("humidity").textContent =
+                    data.humidity;
+
+                document.getElementById("pressure").textContent =
+                    data.pressure;
+
+                document.getElementById("timestamp").textContent =
+                    data.timestamp;
+            }
+
+            const historyResponse = await fetch("/api/history");
+
+            if (!historyResponse.ok) {
+                return;
+            }
+
+            const readings = await historyResponse.json();
+
+            readings.reverse();
+
+            const labels = readings.map(reading => reading.timestamp);
+            const temperatures = readings.map(reading => reading.temperature);
+            const humidities = readings.map(reading => reading.humidity);
+            const pressures = readings.map(reading => reading.pressure);
+
+            if (temperatureChart) temperatureChart.destroy();
+            if (humidityChart) humidityChart.destroy();
+            if (pressureChart) pressureChart.destroy();
+
+            temperatureChart = new Chart(
+                document.getElementById("temperatureChart"),
+                {
+                    type: "line",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Temperature (°C)",
+                            data: temperatures
+                        }]
+                    }
+                }
+            );
+
+            humidityChart = new Chart(
+                document.getElementById("humidityChart"),
+                {
+                    type: "line",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Humidity (%)",
+                            data: humidities
+                        }]
+                    }
+                }
+            );
+
+            pressureChart = new Chart(
+                document.getElementById("pressureChart"),
+                {
+                    type: "line",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Pressure (hPa)",
+                            data: pressures
+                        }]
+                    }
+                }
+            );
+        }
+
+        updateDashboard();
+
+        setInterval(updateDashboard, 5000);
+    </script>
+</body>
+</html>
