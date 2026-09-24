@@ -4,19 +4,9 @@ ESP32-based environmental monitoring system that collects temperature, humidity,
 
 ## Planned Architecture
 
-BME280 Sensors
-      ↓
-    ESP32
-      ↓
-     Wi-Fi
-      ↓
- Computer / Server
-      ↓
-    SQLite
-      ↓
-   Dashboard
+BME280 Sensors => ESP32 => Wi-Fi => Computer / Server => SQLite => Dashboard
 
-## Hardware
+## Main Hardware
 
 - ESP32 development board
 - BME280 environmental sensor
