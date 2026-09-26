@@ -22,4 +22,4 @@ BME280 Sensors => ESP32 => Wi-Fi => Computer / Server => SQLite => Dashboard
 
 ## Status
 
-Currently setting up SQL database
+Currently working on hardware integration.
